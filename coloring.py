@@ -1,14 +1,6 @@
 import networkx as nx
 
-#temporary
-colors = range(1,20)
-G = nx.cycle_graph(5)
-S = nx.strong_product(G,G)
 
-UB = 25
-LB = 25
-chi = -1
-M = 0
 
 def colorIsSafe(graph, neighbors, color):
     for n in neighbors:
@@ -25,6 +17,34 @@ def countColorsUsed(graph):
 
     return len(d.keys())
 
+def maxCommonColorSet(graph):
+    d = {}
+    for n in graph.nodes():
+        currentColor = graph.node[n]['color']
+        if currentColor not in d:
+            d[currentColor] = [n]
+        else:
+            d[currentColor].append(n)
+
+    maxCount = 0
+    c = -1
+    for color in d.keys():
+        if len(d[color]) > maxCount:
+            maxCount = len(d[color])
+            c = color
+    return d[c]
+
+
+def verifyColoring(graph):
+    for n in graph.nodes():
+        neighbors = graph.neighbors(n)
+        for m in neighbors:
+            if graph.node[m]['color'] == graph.node[n]['color']:
+                print 'false'
+    print 'true'
+
+
+#k = number of colors, n = current vertex index
 def colorUtil(vertex, vertexList, graph, k, n):
     #get the adjacent vertices of this vertex
     neighbors = graph.neighbors(vertex)
@@ -52,6 +72,9 @@ def colorUtil(vertex, vertexList, graph, k, n):
 
     return False
 
+#test out algorithm
+G = nx.cycle_graph(5)
+S = nx.strong_product(G,G)
 
 for n in S.nodes():
     S.node[n]['color'] = -1
@@ -66,14 +89,23 @@ for v in vertexIter:
     vertexList.append(v)
 
 #attempt a 5 coloring
-colorUtil(vertexList[0], vertexList,S,5,0)
+colorUtil(vertexList[0], vertexList, S, 5, 0)
 
 for n in S.nodes(data=True):
     print n
 print "colors used:"
 print countColorsUsed(S)
+print "Largest set with same color:"
+print maxCommonColorSet(S)
+print "verify solution: "
+verifyColoring(S)
 
 
+
+# UB = 25
+# LB = 25
+# chi = -1
+# M = 0
 
 #print chi
 # M = number of colors used in current coloring
