@@ -1,5 +1,5 @@
 import networkx as nx
-
+import matplotlib.pyplot as plt
 
 
 def colorIsSafe(graph, neighbors, color):
@@ -97,9 +97,30 @@ print "colors used:"
 print countColorsUsed(S)
 print "Largest set with same color:"
 print maxCommonColorSet(S)
-print "verify solution: "
-verifyColoring(S)
+#print "verify solution: "
+#verifyColoring(S)
 
+
+pos = nx.circular_layout(S)
+
+colorList = []
+labels = {}
+for n in S.nodes():
+    colorList.append(S.node[n]['color'])
+    labels[n] = n
+
+
+nx.draw_networkx_nodes(S, pos,
+                       node_color=colorList,
+                       node_size=620
+                       )
+nx.draw_networkx_edges(S,pos,width=1.0,alpha=0.5)
+                       
+nx.draw_networkx_labels(S,pos,labels,font_size=10, font_color='white')
+
+plt.axis('off')
+plt.savefig("labels_and_colors.png") # save as png
+plt.show() # display
 
 
 # UB = 25
