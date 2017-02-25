@@ -101,10 +101,13 @@ print maxCommonColorSet(S)
 #verifyColoring(S)
 
 
+#drawing
 pos = nx.circular_layout(S)
 
 colorList = []
 labels = {}
+#matplotlib maps color integers to some range, can control
+#this using a parameter to draw_networkx_nodes apparently
 for n in S.nodes():
     colorList.append(S.node[n]['color'])
     labels[n] = n
