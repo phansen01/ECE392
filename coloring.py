@@ -73,7 +73,7 @@ def colorUtil(vertex, vertexList, graph, k, n):
     return False
 
 #test out algorithm
-G = nx.cycle_graph(5)
+G = nx.cycle_graph(6)
 S = nx.strong_product(G,G)
 
 for n in S.nodes():
@@ -89,7 +89,7 @@ for v in vertexIter:
     vertexList.append(v)
 
 #attempt a 5 coloring
-colorUtil(vertexList[0], vertexList, S, 5, 0)
+colorUtil(vertexList[0], vertexList, S, 4, 0)
 
 for n in S.nodes(data=True):
     print n
@@ -97,6 +97,7 @@ print "colors used:"
 print countColorsUsed(S)
 print "Largest set with same color:"
 print maxCommonColorSet(S)
+print "With size %d" % len(maxCommonColorSet(S))
 #print "verify solution: "
 #verifyColoring(S)
 
