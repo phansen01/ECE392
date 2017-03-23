@@ -3,6 +3,8 @@ import networkx as nx
 import itertools
 from random import choice
 
+
+
 #expects a vertex yr, table s, MIS k
 def reachableYR(yr, s, k):
     len_y = len(s[0])
@@ -47,6 +49,44 @@ def connectGRKEdges(grk, s, k):
                             and s[x_j][y][yr_j] > 0
                         ):
                             grk.add_edge(yr_i, yr_j)
+
+
+def connectGRK2Edges(grk2, s, k):
+    len_x = len(s)
+    len_y = len(s[0])
+    len_yr = len(s[0][0])
+    
+    kx1 = [x[0] for x in k]
+    kx2 = [x[1] for x in k]
+        
+
+    yr_nodes = [yr for yr in range(len_yr)]
+    yr_pairs = [pair for pair in itertools.product(yr_nodes, yr_nodes)]
+
+    y_nodes = [y for y in range(len_y)]
+    y_pairs = [pair for pair in itertools.product(y_nodes, y_nodes)]
+
+    reachable_y = [(y1,y2) for (y1,y2) in y_pairs
+                   if reachableY(y1, s, kx1)
+                   and reachableY(y2, s, kx2)]
+
+    reachable_yr = grk2.nodes()
+
+    for y in reachable_y:
+        for yr_i in reachable_yr:
+            for yr_j in reachable_yr:
+                for x_i in k:
+                    for x_j in k:
+                        if ( x_i != x_j
+                             and yr_i != yr_j
+                             and s[x_i[0]][y[0]][yr_i[0]] > 0
+                             and s[x_j[0]][y[0]][yr_j[0]] > 0
+                             and s[x_i[1]][y[1]][yr_i[1]] > 0
+                             and s[x_j[1]][y[1]][yr_j[1]] > 0
+                        ):
+                            grk2.add_edge(yr_i, yr_j)
+                   
+    
 
 #generate the confusability graph
 def generateGXYYR(s):
@@ -99,6 +139,45 @@ def generateGRK(g, s):
         connectGRKEdges(grk, s, k)
         print "connected edges in GR|K:"
         print grk.edges()
+
+
+def generateGRK2(g2, s):
+    len_x = len(s)
+    len_y = len(s[0])
+    len_yr = len(s[0][0])
+
+    ind = []
+    for n in itertools.combinations(g2.nodes(), setUtil(g2)):
+        if isIndependent(g2,set(n)):
+            ind.append(n)
+
+    # print "all MISs of gxyyr2:"
+    # print [i for i in ind]
+
+    #generate all possible yr pairs to be checked
+    #for reachability by (x1, x2) pairs
+    yr_nodes = [yr for yr in range(len_yr)]
+    yr_pairs = [pair for pair in itertools.product(yr_nodes, yr_nodes)]
+    print "yr pairs:"
+    print yr_pairs
+    
+    for k in ind:
+        #for a given MIS in ind, kx1 is the x1 values
+        #of each (x1, x2) pair.
+        kx1 = [x[0] for x in k]
+        kx2 = [x[1] for x in k]
+        grk2 = nx.Graph()
+        nodes = [(yr1, yr2) for (yr1, yr2) in yr_pairs
+                 if (reachableYR(yr1, s, kx1) and
+                     reachableYR(yr2, s, kx2))]
+        grk2.add_nodes_from(nodes)
+        # print "grk2 nodes:"
+        # print nodes
+        connectGRK2Edges(grk2, s, k)
+        print "connected edges in GR|K^2:"
+        print grk2.edges()
+        
+
 
 #todo: see if there is a speed difference
 #between constructing a set of the neighbors and the nodes
@@ -206,9 +285,22 @@ for row in s:
 #generate the confusability graph G of X given Y, YR
 gxyyr = generateGXYYR(s)
 
+gxyyr2 = nx.strong_product(gxyyr, gxyyr)
+
+print "gxyyr2 nodes:"
+print gxyyr2.nodes()
+
+print "gxyyr2 edges:"
+print gxyyr2.edges()
+
+print "\n\n"
+
+print "MIS number for gxyyr2: "
+print setUtil(gxyyr2)
 #from that generate G R given K graphs.
 generateGRK(gxyyr, s)
 
+generateGRK2(gxyyr2, s)
 
 #G = nx.cycle_graph(7)
 #S = nx.strong_product(G, G)
