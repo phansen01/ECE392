@@ -1,8 +1,9 @@
+
 import networkx as nx
 #import matplotlib.pyplot as plt
 import itertools
 from random import choice
-
+import coloring
 
 
 #expects a vertex yr, table s, MIS k
@@ -130,6 +131,7 @@ def generateGRK(g, s):
     print "All MISs of Gx|y,yr:"
     print ind
 
+    grkList = []
     for k in ind:
         grk = nx.Graph()
         nodes = [yr for yr in range(len_yr) if reachableYR(yr, s, k)]
@@ -139,7 +141,9 @@ def generateGRK(g, s):
         connectGRKEdges(grk, s, k)
         print "connected edges in GR|K:"
         print grk.edges()
+        grkList.append(grk)
 
+    return grkList
 
 def generateGRK2(g2, s):
     len_x = len(s)
@@ -158,9 +162,8 @@ def generateGRK2(g2, s):
     #for reachability by (x1, x2) pairs
     yr_nodes = [yr for yr in range(len_yr)]
     yr_pairs = [pair for pair in itertools.product(yr_nodes, yr_nodes)]
-    print "yr pairs:"
-    print yr_pairs
-    
+        
+    grk2List = []
     for k in ind:
         #for a given MIS in ind, kx1 is the x1 values
         #of each (x1, x2) pair.
@@ -174,10 +177,11 @@ def generateGRK2(g2, s):
         # print "grk2 nodes:"
         # print nodes
         connectGRK2Edges(grk2, s, k)
-        print "connected edges in GR|K^2:"
-        print grk2.edges()
-        
+        # print "connected edges in GR|K^2:"
+        # print grk2.edges()
+        grk2List.append(grk2)
 
+    return grk2List
 
 #todo: see if there is a speed difference
 #between constructing a set of the neighbors and the nodes
@@ -298,9 +302,18 @@ print "\n\n"
 print "MIS number for gxyyr2: "
 print setUtil(gxyyr2)
 #from that generate G R given K graphs.
-generateGRK(gxyyr, s)
+grk = generateGRK(gxyyr, s)
 
-generateGRK2(gxyyr2, s)
+grk2 = generateGRK2(gxyyr2, s)
+
+print "num of grk2 graphs to consider:"
+print len(grk2)
+
+print "min coloring of all grk graphs:"
+print min([coloring.minimalColoringMP(g) for g in grk])
+
+print "min coloring of all grk^2 graphs:"
+print min([coloring.minimalColoringMP(g2) for g2 in grk2])
 
 #G = nx.cycle_graph(7)
 #S = nx.strong_product(G, G)

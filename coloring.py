@@ -1,5 +1,9 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
+#from functools import partial
+import itertools
+
 
 
 def colorIsSafe(graph, neighbors, color):
@@ -40,8 +44,8 @@ def verifyColoring(graph):
         neighbors = graph.neighbors(n)
         for m in neighbors:
             if graph.node[m]['color'] == graph.node[n]['color']:
-                print 'false'
-    print 'true'
+                return False
+    return True
 
 
 #k = number of colors, n = current vertex index
@@ -72,59 +76,106 @@ def colorUtil(vertex, vertexList, graph, k, n):
 
     return False
 
-#test out algorithm
-G = nx.cycle_graph(6)
-S = nx.strong_product(G,G)
+def colorHelper(g, k):
+    if colorUtil(g.nodes()[0], g.nodes(), g, k, 0):
+        return True
 
-for n in S.nodes():
-    S.node[n]['color'] = -1
+    return False
 
-for n in G.nodes():
-    G.node[n]['color'] = -1
+def colorHelper_star(a_b):
+    """Convert `f([1,2])` to `f(1,2)` call."""
+    return colorHelper(*a_b)
 
-vertexIter = nx.nodes_iter(S)
-vertexList = []
 
-for v in vertexIter:
-    vertexList.append(v)
+def minimalColoringMP(g):
+    p = Pool(4)
 
-#attempt a 5 coloring
-colorUtil(vertexList[0], vertexList, S, 4, 0)
+    max_degree = max([g.degree(v) for v in g.nodes()])
 
-for n in S.nodes(data=True):
-    print n
-print "colors used:"
-print countColorsUsed(S)
-print "Largest set with same color:"
-print maxCommonColorSet(S)
-print "With size %d" % len(maxCommonColorSet(S))
+    upper_bound = max_degree + 1
+
+    for n in g.nodes():
+        g.node[n]['color'] = -1
+
+    colorings = range(1, upper_bound + 1)
+    #graphs = [g.copy() for _ in range(len(colorings))]
+
+    #print colorings
+    #print graphs
+
+    return p.map(colorHelper_star,
+                 itertools.izip(
+                     itertools.repeat(g.copy()),
+                     colorings)
+    ).index(True) + 1
+
+
+
+def minimalColoring(g):
+
+    #max_degree = max([g.degree(v) for v in g.nodes()])
+
+    #upper_bound = max_degree + 1
+    
+    #max_clique_size = max([len(c.nodes()) for c in list(nx.find_cliques(g))])
+
+    for n in g.nodes():
+        g.node[n]['color'] = -1
+    
+    for k in range(1, len(g.nodes()) + 1):
+        #attempt a k-coloring
+        if colorUtil(g.nodes()[0], g.nodes(), g, k, 0):
+            print k
+            return k
+
+        # if verifyColoring(g):
+        #     print k
+        #     return k
+
+
+# g = nx.cycle_graph(5)
+# g2 = nx.strong_product(g, g)
+
+# #print minimalColoringMP(g2)
+
+# graphs = [g2.copy() for _ in range(100)]
+# # #print graphs
+# #print min([minimalColoring(x) for x in graphs])
+# for x in graphs:
+#     print minimalColoringMP(x)
+
+# print "colors used:"
+# print countColorsUsed(S)
+# print "Largest set with same color:"
+# print maxCommonColorSet(S)
+# print "With size %d" % len(maxCommonColorSet(S))
 #print "verify solution: "
 #verifyColoring(S)
 
 
 #drawing
-pos = nx.circular_layout(S)
+# pos = nx.circular_layout(S)
 
-colorList = []
-labels = {}
-#matplotlib maps color integers to some range, can control
-#this using a parameter to draw_networkx_nodes apparently
-for n in S.nodes():
-    colorList.append(S.node[n]['color'])
-    labels[n] = n
+# colorList = []
+# labels = {}
+# #matplotlib maps color integers to some range, can control
+# #this using a parameter to draw_networkx_nodes apparently
+# for n in S.nodes():
+#     colorList.append(S.node[n]['color'])
+#     labels[n] = n
 
 
-nx.draw_networkx_nodes(S, pos,
-                       node_color=colorList,
-                       node_size=620
-                       )
-nx.draw_networkx_edges(S,pos,width=1.0,alpha=0.5)
+# nx.draw_networkx_nodes(S, pos,
+#                        node_color=colorList,
+#                        node_size=620
+#                        )
+# nx.draw_networkx_edges(S,pos,width=1.0,alpha=0.5)
                        
-nx.draw_networkx_labels(S,pos,labels,font_size=10, font_color='white')
+# nx.draw_networkx_labels(S,pos,labels,font_size=10, font_color='white')
 
-plt.axis('off')
-plt.savefig("labels_and_colors.png") # save as png
-plt.show() # display
+# plt.axis('off')
+# plt.savefig("labels_and_colors.png") # save as png
+# plt.show() # display
 
 
 # UB = 25
