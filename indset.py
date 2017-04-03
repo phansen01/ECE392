@@ -1,10 +1,10 @@
-
+import time
 import networkx as nx
 #import matplotlib.pyplot as plt
 import itertools
 from random import choice
 import coloring
-
+import tables
 
 #expects a vertex yr, table s, MIS k
 def reachableYR(yr, s, k):
@@ -99,8 +99,8 @@ def generateGXYYR(s):
     g = nx.Graph()
     g.add_nodes_from([v for v in range(len_x)])
 
-    print "g nodes"
-    print g.nodes()
+    # print "g nodes"
+    # print g.nodes()
 
     #todo: can probably refactor this into a
     #list comprehension, not a big deal right now.
@@ -114,8 +114,8 @@ def generateGXYYR(s):
                     if (x_i != x_j) and (s[x_i][y][yr] > 0) and (s[x_j][y][yr] > 0):
                         g.add_edge(x_i,x_j)
     
-    print "edges after comparison"
-    print g.edges()
+    # print "edges after comparison"
+    # print g.edges()
     return g
 
 #expects G_X|Y,Y_r, s
@@ -128,19 +128,19 @@ def generateGRK(g, s):
     for n in itertools.combinations(g.nodes(), setUtil(g)):
         if isIndependent(g,set(n)):
             ind.append(n)
-    print "All MISs of Gx|y,yr:"
-    print ind
+    #print "All MISs of Gx|y,yr:"
+    #print ind
 
     grkList = []
     for k in ind:
         grk = nx.Graph()
         nodes = [yr for yr in range(len_yr) if reachableYR(yr, s, k)]
         grk.add_nodes_from(nodes)
-        print "grk nodes:"
-        print grk.nodes()
+        #print "grk nodes:"
+        #print grk.nodes()
         connectGRKEdges(grk, s, k)
-        print "connected edges in GR|K:"
-        print grk.edges()
+        #print "connected edges in GR|K:"
+        #print grk.edges()
         grkList.append(grk)
 
     return grkList
@@ -174,11 +174,13 @@ def generateGRK2(g2, s):
                  if (reachableYR(yr1, s, kx1) and
                      reachableYR(yr2, s, kx2))]
         grk2.add_nodes_from(nodes)
-        # print "grk2 nodes:"
-        # print nodes
+        #print "grk2 nodes:"
+        #print nodes
         connectGRK2Edges(grk2, s, k)
-        # print "connected edges in GR|K^2:"
-        # print grk2.edges()
+        #print "edges in grk2: {}".format(len(grk2.edges()))
+        #for edge in grk2.edges():
+            #print "edge: {}".format(edge)
+            
         grk2List.append(grk2)
 
     return grk2List
@@ -265,55 +267,66 @@ def setUtil(graph):
 #s = [[[choice([0,1]) for x in range(5)] for y in range(5)] for z in range(5)]
 
 #this populates s with all zeros so we can assign specific nonzero values...
-s = [[[0 for x in range(5)] for y in range(5)] for z in range(5)]
+# s = [[[0 for x in range(5)] for y in range(5)] for z in range(5)]
 
-#using the table from the paper plus junk (nonzero) values.
-s[0][0][2] = .4
-s[0][0][3] = .4
-s[0][1][0] = .1
-s[0][1][1] = .9
-s[1][1][1] = .9
-s[1][2][2] = .9
-s[2][2][0] = .9
-s[2][3][2] = .9
-s[3][1][3] = .9
-s[3][3][3] = .9
-s[3][4][2] = .9
-s[4][0][0] = .9
-s[4][4][4] = .9
+# #using the table from the paper plus junk (nonzero) values.
+# s[0][0][2] = .4
+# s[0][0][3] = .4
+# s[0][1][0] = .1
+# s[0][1][1] = .9
+# s[1][1][1] = .9
+# s[1][2][2] = .9
+# s[2][2][0] = .9
+# s[2][3][2] = .9
+# s[3][1][3] = .9
+# s[3][3][3] = .9
+# s[3][4][2] = .9
+# s[4][0][0] = .9
+# s[4][4][4] = .9
 
-for row in s:
-    print row
+# for row in s:
+#     print row
+
+
+
 
 
 #generate the confusability graph G of X given Y, YR
-gxyyr = generateGXYYR(s)
+# gxyyr = generateGXYYR(s)
 
-gxyyr2 = nx.strong_product(gxyyr, gxyyr)
+# gxyyr2 = nx.strong_product(gxyyr, gxyyr)
 
-print "gxyyr2 nodes:"
-print gxyyr2.nodes()
+# print "gxyyr2 nodes:"
+# print gxyyr2.nodes()
 
-print "gxyyr2 edges:"
-print gxyyr2.edges()
+# print "gxyyr2 edges:"
+# print gxyyr2.edges()
 
-print "\n\n"
+# print "\n\n"
 
-print "MIS number for gxyyr2: "
-print setUtil(gxyyr2)
-#from that generate G R given K graphs.
-grk = generateGRK(gxyyr, s)
+# print "MIS number for gxyyr2: "
+# print setUtil(gxyyr2)
+# #from that generate G R given K graphs.
+# grk = generateGRK(gxyyr, s)
 
-grk2 = generateGRK2(gxyyr2, s)
+# grk2 = generateGRK2(gxyyr2, s)
 
-print "num of grk2 graphs to consider:"
-print len(grk2)
+# print "num of grk2 graphs to consider: {}".format(len(grk2))
 
-print "min coloring of all grk graphs:"
-print min([coloring.minimalColoringMP(g) for g in grk])
+# for _ in range(25):
+#     start = time.time()
+#     coloring.minimalColoring(choice(grk2))
+#     end = time.time()
+#     print "time to compute coloring: {}".format(end-start)
 
-print "min coloring of all grk^2 graphs:"
-print min([coloring.minimalColoringMP(g2) for g2 in grk2])
+# for x in grk2:
+#     print nx.adjacency_matrix(x).todense()
+
+# print "min coloring of all grk graphs:"
+# print min([coloring.minimalColoring(g) for g in grk])
+
+# print "min coloring of all grk^2 graphs:"
+# print min([coloring.minimalColoring(g2) for g2 in grk2])
 
 #G = nx.cycle_graph(7)
 #S = nx.strong_product(G, G)

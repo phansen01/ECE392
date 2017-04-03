@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 #from functools import partial
 import itertools
-
+from random import choice
 
 
 def colorIsSafe(graph, neighbors, color):
@@ -69,7 +69,7 @@ def colorUtil(vertex, vertexList, graph, k, n):
             #this color is safe, try assigning it
             graph.node[vertex]['color'] = color
 
-            if colorUtil(vertexList[n+1], vertexList, graph, k, n+1) == True:
+            if colorUtil(vertexList[n+1], vertexList, graph, k, n+1):
                 return True
             #if this coloring didn't lead to a solution, backtrack
             graph.node[vertex]['color'] = -1
@@ -88,44 +88,62 @@ def colorHelper_star(a_b):
 
 
 def minimalColoringMP(g):
+    if len(g.nodes()) == 0:
+        return 0
+
     p = Pool(4)
 
     max_degree = max([g.degree(v) for v in g.nodes()])
 
     upper_bound = max_degree + 1
 
+    cliques = list(nx.find_cliques(g))
+
+    if len(cliques) == 0:
+        lower_bound = 1
+
+    else:
+        lower_bound = len(max(cliques))
+
+    #print "lower bound: {}, upper bound: {}".format(max_clique_size, upper_bound)
+
+    if upper_bound == lower_bound:
+        return upper_bound
+
     for n in g.nodes():
         g.node[n]['color'] = -1
 
-    colorings = range(1, upper_bound + 1)
+    colorings = range(lower_bound, upper_bound + 1)
     #graphs = [g.copy() for _ in range(len(colorings))]
 
     #print colorings
     #print graphs
 
-    return p.map(colorHelper_star,
+    chi = p.map(colorHelper_star,
                  itertools.izip(
                      itertools.repeat(g.copy()),
                      colorings)
     ).index(True) + 1
-
+    #print "chi = {}".format(chi)
+    return chi
 
 
 def minimalColoring(g):
 
-    #max_degree = max([g.degree(v) for v in g.nodes()])
+    # max_degree = max([g.degree(v) for v in g.nodes()])
 
-    #upper_bound = max_degree + 1
+    # upper_bound = max_degree + 1
+
+    #lower bound
+    #max_clique_size = len(max(list(nx.find_cliques(g))))    #max_degree = max([g.degree(v) for v in g.nodes()])
     
-    #max_clique_size = max([len(c.nodes()) for c in list(nx.find_cliques(g))])
-
     for n in g.nodes():
         g.node[n]['color'] = -1
     
     for k in range(1, len(g.nodes()) + 1):
         #attempt a k-coloring
         if colorUtil(g.nodes()[0], g.nodes(), g, k, 0):
-            print k
+            #print k
             return k
 
         # if verifyColoring(g):
@@ -133,16 +151,20 @@ def minimalColoring(g):
         #     return k
 
 
-# g = nx.cycle_graph(5)
+# g = nx.cycle_graph(6)
+
+
 # g2 = nx.strong_product(g, g)
 
-# #print minimalColoringMP(g2)
 
-# graphs = [g2.copy() for _ in range(100)]
+
+#print minimalColoringMP(g2)
+
+# graphs = [nx.dense_gnm_random_graph(choice(range(25,30)), choice(range(15,150))) for _ in range(100)]
 # # #print graphs
 # #print min([minimalColoring(x) for x in graphs])
 # for x in graphs:
-#     print minimalColoringMP(x)
+#     minimalColoring(x)
 
 # print "colors used:"
 # print countColorsUsed(S)

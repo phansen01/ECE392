@@ -120,9 +120,9 @@ int main()
       {0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,1},
       {1,1,0,1,0,0,1,0,1,0,0,1,1,1,1,1,0,1,0,0,1,1,0,1,0}
     };
-    int m = 3; // Number of colors
+    // int m = 3; // Number of colors
 
-    for(int m = 1; m <= V; m++) {
+    for(int m = 5; m <= V; m++) {
       if(graphColoring (graph, m))
         return 0;
     }
