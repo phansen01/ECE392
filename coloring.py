@@ -128,7 +128,7 @@ def minimalColoringMP(g):
     return chi
 
 
-def minimalColoring(g):
+def minimalColoring(g, r):
 
     # max_degree = max([g.degree(v) for v in g.nodes()])
 
@@ -136,11 +136,21 @@ def minimalColoring(g):
 
     #lower bound
     #max_clique_size = len(max(list(nx.find_cliques(g))))    #max_degree = max([g.degree(v) for v in g.nodes()])
-    
+    cliques = list(nx.find_cliques(g))
+    if len(cliques) == 0:
+        lower_bound = 1
+    else:
+        lower_bound = len(max(cliques))
+
+    #dont bother coloring if lower bound is more than we are
+    #looking for
+    if lower_bound > r:
+        return lower_bound
+
     for n in g.nodes():
         g.node[n]['color'] = -1
     
-    for k in range(1, len(g.nodes()) + 1):
+    for k in range(lower_bound, len(g.nodes()) + 1):
         #attempt a k-coloring
         if colorUtil(g.nodes()[0], g.nodes(), g, k, 0):
             #print k
