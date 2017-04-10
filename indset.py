@@ -141,7 +141,7 @@ def generateGRK(g, s):
         connectGRKEdges(grk, s, k)
         #print "connected edges in GR|K:"
         #print grk.edges()
-        grkList.append(grk)
+        grkList.append((grk,k))
 
     return grkList
 
@@ -181,7 +181,7 @@ def generateGRK2(g2, s):
         #for edge in grk2.edges():
             #print "edge: {}".format(edge)
             
-        grk2List.append(grk2)
+        grk2List.append((grk2, k))
 
     return grk2List
 
