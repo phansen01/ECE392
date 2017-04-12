@@ -7,12 +7,21 @@ import time
 
 s_gen = tables.getTableGenerator()
 
+
+#working values:
+#89142433 3/8 colors
+#89149963 3/7 colors
+#89150081 3/7
+#89150083 3/7
+#69210692 2/3
+
+
 i = 0
 start = time.time()
 for s in s_gen:
     
-    #known to be a working example
-    if i <= 99141633:
+
+    if i <= 59210691:
         i+=1
         continue
     #generate the confusability graph G of X given Y, YR
@@ -55,14 +64,16 @@ for s in s_gen:
     g2min = nx.Graph()
     k2min = []
     for (g2, k2) in pairs2:
-        c = coloring.minimalColoring(g2,r1)
+        c = coloring.minimalColoring(g2,r1*r1)
         
         if c < r2:
+            #print "c = {}\ngraph: {}".format(c, g2.edges())
+            #coloring.displayColoring(g2)
             r2 = c
             g2min = g2.copy()
             k2min = k2
 
-    if math.sqrt(float(r2)) < r1:
+    if math.sqrt(float(r2)) < r1 and r2 < 7:
         print "i = {}\nnumber of colors for r2: {}".format(i,r2)
         print "Found s matching, s:\n{}\n\ngrk^2:{}".format(s,g2min.nodes())
         print "grk^2 edges: {}".format(g2min.edges())
@@ -70,6 +81,8 @@ for s in s_gen:
         print "gxyyr^1 edges: {}".format(gxyyr.edges())
         print "gxyyr^2 edges: {}".format(gxyyr2.edges())
         print "MIS for grk^1: {}\nMIS for grk^2: {}".format(k1min, k2min)
+        coloring.displayColoring(g1min)
+        coloring.displayColoring(g2min)
         break
 
     if i%100 == 0:
@@ -78,8 +91,6 @@ for s in s_gen:
         start = time.time()
         print "r1 = {}".format(r1)
         print "r2 = {}".format(r2)
-
-
 
     i+=1
     

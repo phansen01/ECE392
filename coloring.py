@@ -6,12 +6,6 @@ import itertools
 from random import choice
 
 
-def colorIsSafe(graph, neighbors, color):
-    for n in neighbors:
-        if graph.node[n]['color'] == color:
-            return False
-    return True
-
 def countColorsUsed(graph):
     d = {}
     for n in graph.nodes():
@@ -20,6 +14,43 @@ def countColorsUsed(graph):
             d[currentColor] = 1
 
     return len(d.keys())
+
+def displayColoring(graph):
+#drawing
+    minimalColoring(graph,len(graph.nodes()) + 1)
+    print "using {} colors".format(countColorsUsed(graph))
+
+    pos = nx.circular_layout(graph)
+
+    colorList = []
+    labels = {}
+    #matplotlib maps color integers to some range, can control
+    #this using a parameter to draw_networkx_nodes apparently
+    for n in graph.nodes():
+        colorList.append(graph.node[n]['color'])
+        labels[n] = n
+
+
+    nx.draw_networkx_nodes(graph, pos,
+                           node_color=colorList,
+                           node_size=620
+    )
+    nx.draw_networkx_edges(graph, pos, width=1.0, alpha=0.5)
+
+    nx.draw_networkx_labels(graph ,pos,labels,font_size=10, font_color='white')
+
+    plt.axis('off')
+    plt.savefig("grk.png") # save as png
+    plt.show() # display
+
+
+
+
+def colorIsSafe(graph, neighbors, color):
+    for n in neighbors:
+        if graph.node[n]['color'] == color:
+            return False
+    return True
 
 def maxCommonColorSet(graph):
     d = {}
@@ -135,15 +166,15 @@ def minimalColoring(g, r):
     # upper_bound = max_degree + 1
 
     #lower bound
-    #max_clique_size = len(max(list(nx.find_cliques(g))))    #max_degree = max([g.degree(v) for v in g.nodes()])
+    max_clique_size = len(max(list(nx.find_cliques(g))))    #max_degree = max([g.degree(v) for v in g.nodes()])
     cliques = list(nx.find_cliques(g))
     if len(cliques) == 0:
         lower_bound = 1
     else:
         lower_bound = len(max(cliques))
 
-    #dont bother coloring if lower bound is more than we are
-    #looking for
+    # dont bother coloring if lower bound is more than we are
+    # looking for
     if lower_bound > r:
         return lower_bound
 
@@ -161,84 +192,14 @@ def minimalColoring(g, r):
         #     return k
 
 
+
+
+
+
 # g = nx.cycle_graph(6)
 
 
 # g2 = nx.strong_product(g, g)
 
-
-
-#print minimalColoringMP(g2)
-
-# graphs = [nx.dense_gnm_random_graph(choice(range(25,30)), choice(range(15,150))) for _ in range(100)]
-# # #print graphs
-# #print min([minimalColoring(x) for x in graphs])
-# for x in graphs:
-#     minimalColoring(x)
-
-# print "colors used:"
-# print countColorsUsed(S)
-# print "Largest set with same color:"
-# print maxCommonColorSet(S)
-# print "With size %d" % len(maxCommonColorSet(S))
-#print "verify solution: "
-#verifyColoring(S)
-
-
-#drawing
-# pos = nx.circular_layout(S)
-
-# colorList = []
-# labels = {}
-# #matplotlib maps color integers to some range, can control
-# #this using a parameter to draw_networkx_nodes apparently
-# for n in S.nodes():
-#     colorList.append(S.node[n]['color'])
-#     labels[n] = n
-
-
-# nx.draw_networkx_nodes(S, pos,
-#                        node_color=colorList,
-#                        node_size=620
-#                        )
-# nx.draw_networkx_edges(S,pos,width=1.0,alpha=0.5)
-                       
-# nx.draw_networkx_labels(S,pos,labels,font_size=10, font_color='white')
-
-# plt.axis('off')
-# plt.savefig("labels_and_colors.png") # save as png
-# plt.show() # display
-
-
-# UB = 25
-# LB = 25
-# chi = -1
-# M = 0
-
-#print chi
-# M = number of colors used in current coloring
-# LB = lower bound on chi(G)
-# UB = upper bound on chi(G)
-# def RecursiveColorAssignment(vertex, vertexList, index, graph):
-#     global chi
-#     global UB
-#     global M
-#     print vertex
-#     neighbors = graph.neighbors(vertex)
-#     for color in colors:
-#         if colorIsSafe(graph, neighbors, color):
-#             graph.node[vertex]['color'] = color
-#             break
-#     if index == len(graph) - 1: #if we're at the last vertex
-#         M = countColorsUsed(graph)
-#         if chi < M:
-#             chi = M
-#             #save the current coloring
-#             if M == LB:
-#                 return
-#             else:
-#                 UB = M - 1
-#     else:
-#         return RecursiveColorAssignment(vertexList[index+1], vertexList, index+1, graph)
 
 
