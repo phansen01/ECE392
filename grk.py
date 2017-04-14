@@ -21,22 +21,15 @@ start = time.time()
 for s in s_gen:
     
 
-    if i <= 59210691:
+    if i <= 69210691:
         i+=1
         continue
     #generate the confusability graph G of X given Y, YR
     gxyyr = indset.generateGXYYR(s)
     
     gxyyr2 = nx.strong_product(gxyyr, gxyyr)
-    
-    #print "gxyyr2 nodes:"
-    #print gxyyr2.nodes()
-    
-    #print "gxyyr2 edges:"
-    #print gxyyr2.edges()
-    
-    #print "MIS number for gxyyr2: "
-    #print indset.setUtil(gxyyr2)
+
+
     #from that generate G R given K graphs.
     pairs = indset.generateGRK(gxyyr, s)
     # grklist = [grk for (grk, k) in pairs]
@@ -73,7 +66,7 @@ for s in s_gen:
             g2min = g2.copy()
             k2min = k2
 
-    if math.sqrt(float(r2)) < r1 and r2 < 7:
+    if math.sqrt(float(r2)) < r1:
         print "i = {}\nnumber of colors for r2: {}".format(i,r2)
         print "Found s matching, s:\n{}\n\ngrk^2:{}".format(s,g2min.nodes())
         print "grk^2 edges: {}".format(g2min.edges())
@@ -81,13 +74,15 @@ for s in s_gen:
         print "gxyyr^1 edges: {}".format(gxyyr.edges())
         print "gxyyr^2 edges: {}".format(gxyyr2.edges())
         print "MIS for grk^1: {}\nMIS for grk^2: {}".format(k1min, k2min)
-        coloring.displayColoring(g1min)
-        coloring.displayColoring(g2min)
+        coloring.displayColoring(gxyyr, "ex/"+"gxyyr1_"+str(i))
+        coloring.displayColoring(gxyyr2, "ex/"+"gxyyr2_"+str(i))
+        coloring.displayColoring(g1min, "ex/"+"grk1_"+str(i))
+        coloring.displayColoring(g2min, "ex/"+"grk2_"+str(i))
         break
 
-    if i%100 == 0:
+    if i%1000 == 0:
         end = time.time()
-        print "i={}, time per 100: {}".format(i,end - start)
+        print "i={}, time per 1000: {}".format(i,end - start)
         start = time.time()
         print "r1 = {}".format(r1)
         print "r2 = {}".format(r2)

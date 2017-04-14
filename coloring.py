@@ -15,7 +15,7 @@ def countColorsUsed(graph):
 
     return len(d.keys())
 
-def displayColoring(graph):
+def displayColoring(graph, name):
 #drawing
     minimalColoring(graph,len(graph.nodes()) + 1)
     print "using {} colors".format(countColorsUsed(graph))
@@ -40,7 +40,7 @@ def displayColoring(graph):
     nx.draw_networkx_labels(graph ,pos,labels,font_size=10, font_color='white')
 
     plt.axis('off')
-    plt.savefig("grk.png") # save as png
+    plt.savefig(name + ".png") # save as png
     plt.show() # display
 
 
