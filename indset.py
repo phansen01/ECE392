@@ -1,6 +1,5 @@
 import time
 import networkx as nx
-#import matplotlib.pyplot as plt
 import itertools
 from random import choice
 import coloring
@@ -136,11 +135,7 @@ def generateGRK(g, s):
         grk = nx.Graph()
         nodes = [yr for yr in range(len_yr) if reachableYR(yr, s, k)]
         grk.add_nodes_from(nodes)
-        #print "grk nodes:"
-        #print grk.nodes()
         connectGRKEdges(grk, s, k)
-        #print "connected edges in GR|K:"
-        #print grk.edges()
         grkList.append((grk,k))
 
     return grkList
@@ -155,8 +150,6 @@ def generateGRK2(g2, s):
         if isIndependent(g2,set(n)):
             ind.append(n)
 
-    # print "all MISs of gxyyr2:"
-    # print [i for i in ind]
 
     #generate all possible yr pairs to be checked
     #for reachability by (x1, x2) pairs

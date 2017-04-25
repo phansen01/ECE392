@@ -145,17 +145,12 @@ def minimalColoringMP(g):
         g.node[n]['color'] = -1
 
     colorings = range(lower_bound, upper_bound + 1)
-    #graphs = [g.copy() for _ in range(len(colorings))]
-
-    #print colorings
-    #print graphs
 
     chi = p.map(colorHelper_star,
                  itertools.izip(
                      itertools.repeat(g.copy()),
                      colorings)
     ).index(True) + 1
-    #print "chi = {}".format(chi)
     return chi
 
 
@@ -174,7 +169,7 @@ def minimalColoring(g, r):
         lower_bound = len(max(cliques))
 
     # dont bother coloring if lower bound is more than we are
-    # looking for
+    # looking for (assumes r is normalized to the power of the graph)
     if lower_bound > r:
         return lower_bound
 
@@ -186,20 +181,3 @@ def minimalColoring(g, r):
         if colorUtil(g.nodes()[0], g.nodes(), g, k, 0):
             #print k
             return k
-
-        # if verifyColoring(g):
-        #     print k
-        #     return k
-
-
-
-
-
-
-# g = nx.cycle_graph(6)
-
-
-# g2 = nx.strong_product(g, g)
-
-
-
