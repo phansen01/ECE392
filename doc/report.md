@@ -7,6 +7,9 @@ This report details how some well known concepts in graph theory can be applied 
 ### Graphs
 Graphs are entities made up by vertices/nodes (which can represent many different classes of information) and edges between those vertices. The problems addressed in this report deal only with *undirected* graphs, that is, graphs whose edges do not contain any information about direction between two vertices.
 
+#### Strong Product
+[todo]
+
 ### Coloring
 The graph coloring problem looks to find a minimal set of colors that can be assigned to the vertices of a graph, such that no two vertices connected by an edge share a color. Because finding an *optimal* (i.e. minimal size) set of colors requires consideration of all subsets of the vertices of a graph, all known methods of finding such colorings are of *exponential* time complexity with respect to the input. In other words, it takes an impractical amount of time to find an optimal coloring of a graph for all but the smallest input sizes.
 
@@ -34,6 +37,25 @@ The basis of the maximum independent set algorithm used in this report is as fol
   * return max(1 + MIS(G with V's neighborhood removed), MIS(G without V's neighborhood removed))
 * else (all vertices U,V,W have degree 2):
   * return max(1 + MIS(G with U's neighborhood removed), 1 + MIS(G with V's neighborhood removed), 1 + MIS(G with W's neighborhood removed ))
+
+# Problem Setup
+
+Consider an nxnxn matrix S where a given x index is a value of X 0 to (n-1) containing an nxn matrix with rows given by Y values 0 to (n-1) and columns given by Y<sub>r</sub> values 0 to (n-1). First, find the confusability graph G<sub>X|Y,Y<sub>r</sub></sub>. This graph is defined as follows:
+* vertices given by X
+* edge between two vertices (x, x') if there exists some (y, y<sub>r</sub>) pair such that \
+(S[x][y][y<sub>r</sub>] )*(S[x][y][y<sub>r</sub>] > 0)
+
+Next, find the 2-fold strong product of that graph as defined previously. Then, generate the list of graphs G<sub>R|K</sub>, whose vertices are the y<sub>r</sub> values that are reachable via the x values in K, which is a maximum independent set of G<sub>X|Y,Y<sub>r</sub></sub>. An edge exists between two vertices (y<sub>r</sub>, y'<sub>r</sub>) reachable in S if all of the following are true for some values y, x, x', and a given MIS, K:
+* x and x' are in K
+* x != x'
+* y, x, and x' are reachable in S
+* S[x][y][y<sub>r</sub>] > 0
+* S[x][y][y'<sub>r</sub>] > 0
+
+
+Next, generate G<sub>R|K</sub><sup>2</sup> with the 2-fold confusability graph in a similar manner, where edges exist between two reachable vertices ((y<sub>r, i</sub>, y<sub>r, j</sub>),(y'<sub>r, i</sub>, y'<sub>r, j</sub>)) if the following are true for some pairs (x<sub>i</sub>, x'<sub>i</sub>), (x<sub>j</sub>, x'<sub>j</sub>), (y<sub>i</sub>, y<sub>j</sub>):
+
+ * [todo]
 
 # Documentation of Functionality
 
