@@ -46,7 +46,7 @@ The basis of the maximum independent set algorithm used in this report is as fol
 
 # Problem Setup
 
-Consider an nxnxn (specific examples were generated using 3x3x3) matrix S where a given x index is a value of X 0 to (n-1) containing an nxn matrix with rows given by Y values 0 to (n-1) and columns given by Y<sub>r</sub> values 0 to (n-1). First, find the confusability graph G<sub>X|Y,Y<sub>r</sub></sub>. This graph is defined as follows:
+Consider an nxnxn (specific examples were generated using 3x3x3, and an exhaustive generator of these matrices was used as opposed to any specific example, but this is arbitrary with respect to the rest of the problem) matrix S where a given x index is a value of X 0 to (n-1) containing an nxn matrix with rows given by Y values 0 to (n-1) and columns given by Y<sub>r</sub> values 0 to (n-1). First, find the confusability graph G<sub>X|Y,Y<sub>r</sub></sub>. This graph is defined as follows:
 * vertices given by X
 * edge between two vertices (x, x') if there exists some (y, y<sub>r</sub>) pair such that \
 (S[x][y][y<sub>r</sub>] )*(S[x][y][y<sub>r</sub>]) > 0
