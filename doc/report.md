@@ -46,10 +46,23 @@ The basis of the maximum independent set algorithm used in this report is as fol
 
 # Problem Setup
 
-Consider an nxnxn (specific examples were generated using 3x3x3, and an exhaustive generator of these matrices was used as opposed to any specific example, but this is arbitrary with respect to the rest of the problem) matrix S where a given x index is a value of X 0 to (n-1) containing an nxn matrix with rows given by Y values 0 to (n-1) and columns given by Y<sub>r</sub> values 0 to (n-1). First, find the confusability graph G<sub>X|Y,Y<sub>r</sub></sub>. This graph is defined as follows:
+Consider an nxnxn (specific examples were generated using 3x3x3, and an exhaustive generator of these matrices was used as opposed to any specific example, but this is arbitrary with respect to the rest of the problem) matrix S where a given x index is a value of X 0 to (n-1) containing an nxn matrix with rows given by Y values 0 to (n-1) and columns given by Y<sub>r</sub> values 0 to (n-1). 
+
+```python 
+#get a generator object that succesively returns each possible 3x3x3
+#table
+s_gen = tables.getTableGenerator()
+
+```
+
+First, find the confusability graph G<sub>X|Y,Y<sub>r</sub></sub>. This graph is defined as follows:
 * vertices given by X
 * edge between two vertices (x, x') if there exists some (y, y<sub>r</sub>) pair such that \
 (S[x][y][y<sub>r</sub>] )*(S[x][y][y<sub>r</sub>]) > 0
+
+```python
+gxyyr = indset.generateGXYYR(s)
+```
 
 Next, find the 2-fold strong product of that graph as defined previously. Then, generate the list of graphs G<sub>R|K</sub>, whose vertices are the y<sub>r</sub> values that are reachable via the x values in K, which is a maximum independent set of G<sub>X|Y,Y<sub>r</sub></sub>. An edge exists between two vertices (y<sub>r</sub>, y'<sub>r</sub>) reachable in S if all of the following are true for some values y, x, x', and a given MIS, K:
 * x and x' are in K
@@ -58,6 +71,9 @@ Next, find the 2-fold strong product of that graph as defined previously. Then, 
 * S[x][y][y<sub>r</sub>] > 0
 * S[x][y][y'<sub>r</sub>] > 0
 
+```python
+gxyyr2 = nx.strong_product(gxyyr, gxyyr)
+```
 
 Next, generate the list of G<sup>2</sup> <sub>R|K</sub> graphs with the 2-fold confusability graph G<sup>2</sup><sub>X|Y,Y<sub>r</sub></sub> in a similar manner, where edges exist between two reachable vertices ((y<sub>r, i</sub>, y<sub>r, j</sub>),(y'<sub>r, i</sub>, y'<sub>r, j</sub>)) if the following are true for some pairs (x<sub>i</sub>, x<sub>j</sub>), (x'<sub>i</sub>, x'<sub>j</sub>), (y<sub>i</sub>, y<sub>j</sub>):
 
@@ -70,8 +86,62 @@ Next, generate the list of G<sup>2</sup> <sub>R|K</sub> graphs with the 2-fold c
  * S[x'<sub>i</sub>][y'<sub>i</sub>][y'<sub>r, i</sub>] > 0
  * S[x'<sub>j</sub>][y'<sub>j</sub>][y'<sub>r, j</sub>] > 0
 
+```python
+#this function returns a pair of objects (a,b) where a is a
+#G_R|K graph and b is its associated MIS
+pairs = indset.generateGRK(gxyyr, s)
+...
+pairs2 = indset.generateGRK2(gxyyr2, s)
+```
+
 Then, minimally color both the lists of one-fold and two-fold graphs obtained above. Let r be the smallest chromatic number of all the one-fold graphs. For the two-fold graphs, if the square-root of the chromatic number of the graph is smaller than r, a satisfactory example has been found. These examples are formatted and displayed via `matplotlib` (and saved).
 
+```python
+    #initialize r1 to be larger than the # of nodes in the graph
+    #at first.
+    r1 = 4
+    #g1min will be used to store the graph associated with the minimum
+    #r1 so that it can be viewed. Initialize it to an empty networkx graph
+    g1min = nx.Graph()
+    #k1min will be used to store the MIS associated with that graph.
+    k1min = []
+    for (g1, k1) in pairs:
+        #minimally color each graph
+        c = coloring.minimalColoring(g1, 0)
+        
+        #if its chromatic number is smaller than r1, set r1 to c
+        #and update g1min and k1min with this graph/MIS
+        if c < r1:
+            r1 = c
+            g1min = g1.copy()
+            k1min = k1
+
+    #if the minimum r1 of the 1-fold graphs was 1, move on to the next 
+    #s. This is just a mini-optimization to save some time.
+    if r1 == 1:
+        i+=1
+        continue
+
+    #similarly generate the list of two-fold G_R|K graphs with their
+    #associated MISs.
+    pairs2 = indset.generateGRK2(gxyyr2, s)
+    
+    #as before, minimally color these graphs and look for our 
+    #sqrt(r2) < r1 condition to be met.
+    r2 = 10 #needs to be set to some junk value > number of nodes in g2
+    g2min = nx.Graph()
+    k2min = []
+    for (g2, k2) in pairs2:
+        c = coloring.minimalColoring(g2,r1*r1)
+        
+        if c < r2:
+            r2 = c
+            g2min = g2.copy()
+            k2min = k2
+
+    if math.sqrt(float(r2)) < r1:
+    #code to handle an example of interest being found
+```
 # Documentation of Functionality
 
 ## coloring
